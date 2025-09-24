@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GSAP ScrollSmoother Example</title>
+
+  <script src="js/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="js/ScrollSmoother.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background-color: #1a1721;
+      color: white;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    #wrapper {
+      overflow: hidden;
+      position: fixed;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    #content {
+      width: 100%;
+      padding: 0 0 50vh 0; /* 시작점을 화면 중간에서 시작하도록 */
+    }
+
+    /* 좌우 컬럼 */
+    .images-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 500px; /* 좌우 컬럼 간격 넓게 */
+      width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* 세로 배치 */
+    .images-column {
+      display: flex;
+      flex-direction: column;
+      gap: 30px; /* 위아래 이미지 간격 */
+      position: relative;
+    }
+
+    /* 이미지 기본 스타일 */
+    .images-column img {
+      object-fit: cover;
+      border-radius: 5px;
+      transition: transform 0.3s ease;
+      position: relative;
+      z-index: 1;
+      padding: 20px 0;
+    }
+
+/* 이미지 기본 스타일 (기본은 홀수 이미지가 됨) */
+.images-column img:nth-child(odd) {
+  width: 380px; /* 450px * 2/3 */
+  height: 230px; /* 320px * 2/3 */
+  object-fit: cover;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* 짝수 이미지는 기존대로 2/3 크기 유지 (213x300) */
+.images-column img:nth-child(even) {
+  width: 280px;
+  height: 180px;
+  z-index: 2;
+}
+
+/* --- 지그재그 배치 (겹치도록) --- */
+/* 왼쪽 컬럼 */
+.images-column.left img:nth-child(1),
+.images-column.left img:nth-child(5){
+  transform: translateX(-120px);
+}
+.images-column.left img:nth-child(3){
+  transform: translateX(-120px);
+}
+.images-column.left img:nth-child(even) {
+  transform: translateX(80px);
+  margin-top: -10px;
+}
+
+/* 오른쪽 컬럼 */
+.images-column.right img:nth-child(1),
+.images-column.right img:nth-child(5){
+  transform: translateX(120px);
+}
+.images-column.right img:nth-child(3){
+  transform: translateX(120px);
+}
+.images-column.right img:nth-child(even) {
+  transform: translateX(20px);
+  margin-top: -10px;
+}
+  </style>
+</head>
+<body>
+  <div id="wrapper">
+    <section id="content">
+      <div class="images-wrapper">
+        <!-- 왼쪽 컬럼 (5개) -->
+        <div class="images-column left">
+          <img src="https://picsum.photos/320/450?random=1" alt="">
+          <img src="https://picsum.photos/320/450?random=2" alt="">
+          <img src="https://picsum.photos/320/450?random=3" alt="">
+          <img src="https://picsum.photos/320/450?random=4" alt="">
+          <img src="https://picsum.photos/320/450?random=5" alt="">
+        </div>
+
+        <!-- 오른쪽 컬럼 (5개) -->
+        <div class="images-column right">
+          <img src="https://picsum.photos/320/450?random=6" alt="">
+          <img src="https://picsum.photos/320/450?random=7" alt="">
+          <img src="https://picsum.photos/320/450?random=8" alt="">
+          <img src="https://picsum.photos/320/450?random=9" alt="">
+          <img src="https://picsum.photos/320/450?random=10" alt="">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+
+      let skewSetter = gsap.quickTo("img", "skewY"),
+          clamp = gsap.utils.clamp(-50, 50);
+
+      ScrollSmoother.create({
+        wrapper: "#wrapper",
+        content: "#content",
+        smooth: 2,
+        speed: 3,
+        effects: true,
+        onUpdate: self => skewSetter(clamp(self.getVelocity() / -50)),
+        onStop: () => skewSetter(0)
+      });
+    });
+  </script>
+</body>
+</html>
